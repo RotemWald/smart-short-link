@@ -30,7 +30,7 @@ func (m *Memory) GetUrl(key string, hour int) (*entities.SmartUrl, error) {
 		}
 	}
 	for url := range urls {
-		return url, nil // default url in case there was not found matched url in the above loop
+		return url, nil // default url in case there was not matched url found in the above loop
 	}
 
 	return nil, fmt.Errorf("url not found")
