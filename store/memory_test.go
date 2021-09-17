@@ -1,10 +1,14 @@
 package store
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/RotemWald/smart-short-link/entities"
+)
 
 func TestSimpleSetAndGet(t *testing.T) {
 	store := NewMemory()
-	urls := []*SmartUrl{
+	urls := []*entities.SmartUrl{
 		{
 			StartHour: 0,
 			EndHour:   12,
@@ -40,7 +44,7 @@ func TestSimpleSetAndGet(t *testing.T) {
 
 func TestSetAndRefreshAndThenGet(t *testing.T) {
 	store := NewMemory()
-	urls := []*SmartUrl{
+	urls := []*entities.SmartUrl{
 		{
 			StartHour: 0,
 			EndHour:   12,
