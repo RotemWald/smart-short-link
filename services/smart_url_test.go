@@ -1,6 +1,7 @@
 package services
 
 import (
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -10,7 +11,7 @@ import (
 	"github.com/RotemWald/smart-short-link/repositories"
 )
 
-func TestGetUrl(t *testing.T) {
+func TestSimpleGetUrl(t *testing.T) {
 	repository := repositories.NewDummy()
 	service := NewSmartUrl(repository)
 	url, err := service.GetUrl("a1")
@@ -22,10 +23,21 @@ func TestGetUrl(t *testing.T) {
 	}
 }
 
+func TestMassiveGetUrl(t *testing.T) {
+	repository := repositories.NewDummy()
+	service := NewSmartUrl(repository)
+	for i := 0; i < 100; i++ {
+		_, _ = service.GetUrl("a1")
+		if runtime.NumGoroutine() > 2 {
+			t.Fatal("too many calls to refresh urls mechanism")
+		}
+	}
+}
+
 func TestSetUrlsByUuid(t *testing.T) {
 	repository := repositories.NewDummy()
 	service := NewSmartUrl(repository)
-	uuid, err := service.SetUrlsByUuid(nil)
+	uuid, err := service.SetUrlsByUUID(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
