@@ -1,4 +1,4 @@
-package store
+package repositories
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 )
 
 func TestSimpleSetAndGet(t *testing.T) {
-	store := NewMemory()
+	repository := NewMemory()
 	urls := []*entities.SmartUrl{
 		{
 			StartHour: 0,
@@ -21,11 +21,11 @@ func TestSimpleSetAndGet(t *testing.T) {
 		},
 	}
 
-	if err := store.SetUrls("a1", urls); err != nil {
+	if err := repository.SetUrls("a1", urls); err != nil {
 		t.Fatal(err)
 	}
 
-	url, err := store.GetUrl("a1", 10)
+	url, err := repository.GetUrl("a1", 10)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func TestSimpleSetAndGet(t *testing.T) {
 		t.Fatal("got wrong url")
 	}
 
-	url, err = store.GetUrl("a1", 12)
+	url, err = repository.GetUrl("a1", 12)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func TestSimpleSetAndGet(t *testing.T) {
 }
 
 func TestSetAndRefreshAndThenGet(t *testing.T) {
-	store := NewMemory()
+	repository := NewMemory()
 	urls := []*entities.SmartUrl{
 		{
 			StartHour: 0,
@@ -57,15 +57,15 @@ func TestSetAndRefreshAndThenGet(t *testing.T) {
 		},
 	}
 
-	if err := store.SetUrls("a1", urls); err != nil {
+	if err := repository.SetUrls("a1", urls); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := store.RefreshUrls("a1"); err != nil {
+	if err := repository.RefreshUrls("a1"); err != nil {
 		t.Fatal(err)
 	}
 
-	url, err := store.GetUrl("a1", 10)
+	url, err := repository.GetUrl("a1", 10)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func TestSetAndRefreshAndThenGet(t *testing.T) {
 		t.Fatal("got wrong url")
 	}
 
-	url, err = store.GetUrl("a1", 12)
+	url, err = repository.GetUrl("a1", 12)
 	if err == nil {
 		t.Fatal("should be nil")
 	}

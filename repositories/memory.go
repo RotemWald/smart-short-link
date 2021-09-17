@@ -1,4 +1,4 @@
-package store
+package repositories
 
 import (
 	"fmt"
@@ -7,8 +7,6 @@ import (
 
 	"github.com/RotemWald/smart-short-link/entities"
 )
-
-type smartUrlSet map[*entities.SmartUrl]bool
 
 type Memory struct {
 	urls map[string]smartUrlSet
@@ -56,10 +54,15 @@ func (m *Memory) RefreshUrls(key string) error {
 
 	var wg sync.WaitGroup
 	urlsToBeRemoved := make(chan *entities.SmartUrl, len(urls))
+	sem := make(chan struct{}, 10) // TODO make it configurable
 	for url := range urls {
 		wg.Add(1)
+		sem <- struct{}{}
 		go func(url *entities.SmartUrl, c chan<- *entities.SmartUrl) {
-			defer wg.Done()
+			defer func() {
+				<-sem
+				wg.Done()
+			}()
 			resp, err := http.Get(url.Url)
 			if err != nil || resp.StatusCode < 200 || resp.StatusCode >= 400 {
 				c <- url

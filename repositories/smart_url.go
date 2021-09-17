@@ -1,6 +1,8 @@
-package store
+package repositories
 
 import "github.com/RotemWald/smart-short-link/entities"
+
+type smartUrlSet map[*entities.SmartUrl]bool
 
 type SmartUrl interface {
 	GetUrl(key string, hour int) (*entities.SmartUrl, error)
