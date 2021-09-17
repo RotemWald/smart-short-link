@@ -54,7 +54,7 @@ func (m *Memory) RefreshUrls(key string) error {
 
 	var wg sync.WaitGroup
 	urlsToBeRemoved := make(chan *entities.SmartUrl, len(urls))
-	sem := make(chan struct{}, 10) // TODO make it configurable
+	sem := make(chan struct{}, 8) // this is just an example for controlling the count of concurrent goroutines
 	for url := range urls {
 		wg.Add(1)
 		sem <- struct{}{}
