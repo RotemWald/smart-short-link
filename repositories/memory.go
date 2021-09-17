@@ -74,7 +74,7 @@ func (m *Memory) RefreshUrls(key string) error {
 	}
 	wg.Wait()
 
-	close(brokenUrls)
+	close(brokenUrls) // channel can be safely closed as no one writes to the channel anymore at this time
 	for url := range brokenUrls {
 		delete(urls, url)
 	}
