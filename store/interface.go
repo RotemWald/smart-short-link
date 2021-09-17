@@ -1,4 +1,4 @@
-package storage
+package store
 
 type SmartUrl struct {
 	StartHour int    `json:"start_hour"`
@@ -6,7 +6,8 @@ type SmartUrl struct {
 	Url       string `json:"url"`
 }
 
-type SmartUrlStorage interface {
+type SmartUrlStore interface {
 	GetUrl(key string, hour int) (*SmartUrl, error)
 	SetUrls(key string, urls []*SmartUrl) error
+	RefreshUrls(key string) error
 }
