@@ -10,6 +10,7 @@ import (
 
 type Memory struct {
 	urls map[string]smartUrlSet
+	mu   sync.RWMutex
 }
 
 func NewMemory() *Memory {
@@ -19,7 +20,9 @@ func NewMemory() *Memory {
 }
 
 func (m *Memory) GetUrl(key string, hour int) (*entities.SmartUrl, error) {
+	m.mu.RLock()
 	urls, ok := m.urls[key]
+	m.mu.RUnlock()
 	if !ok {
 		return nil, fmt.Errorf("url not found")
 	}
@@ -37,23 +40,29 @@ func (m *Memory) GetUrl(key string, hour int) (*entities.SmartUrl, error) {
 }
 
 func (m *Memory) SetUrls(key string, urls []*entities.SmartUrl) error {
+	m.mu.RLock()
 	if _, ok := m.urls[key]; ok {
 		return fmt.Errorf("key already exists")
 	}
+	m.mu.RUnlock()
 
+	m.mu.Lock()
 	m.urls[key] = make(smartUrlSet, len(urls))
 	for _, url := range urls {
 		m.urls[key][url] = true
 	}
+	m.mu.Unlock()
 
 	return nil
 }
 
 func (m *Memory) RefreshUrls(key string) error {
+	m.mu.RLock()
 	urls, ok := m.urls[key]
 	if !ok {
 		return fmt.Errorf("url not found")
 	}
+	m.mu.RUnlock()
 
 	var wg sync.WaitGroup
 	brokenUrls := make(chan *entities.SmartUrl, len(urls))
@@ -75,9 +84,11 @@ func (m *Memory) RefreshUrls(key string) error {
 	wg.Wait()
 
 	close(brokenUrls) // channel can be safely closed as no one writes to the channel anymore at this time
+	m.mu.Lock()
 	for url := range brokenUrls {
 		delete(urls, url)
 	}
+	m.mu.Unlock()
 
 	return nil
 }
