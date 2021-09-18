@@ -1,10 +1,10 @@
 # smart-short-link
 
-> SelectMedia.asia Home Assignment
+> A smart short link service which redirects multiple urls by time range
 
 * Using Go 1.17
 * Make sure you have the [`google/uuid`]((https://github.com/google/uuid)) library installed
-* Server is running under port 8080 (http://localhost:8080/)
+* Server is running under port 8080
 
 ## Endpoints
 * `GET /uuid/{key}` redirects by UUID key
