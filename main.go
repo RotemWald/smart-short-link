@@ -10,7 +10,7 @@ import (
 	"github.com/RotemWald/smart-short-link/services"
 )
 
-func handleMultipleEndpoints(endpoints []string, handler func(http.ResponseWriter, *http.Request)) {
+func handleMultipleEndpoints(handler func(http.ResponseWriter, *http.Request), endpoints ...string) {
 	for _, endpoint := range endpoints {
 		http.HandleFunc(endpoint, handler)
 	}
@@ -21,8 +21,8 @@ func main() {
 	service := services.NewSmartUrl(repo)
 	handler := handlers.NewSmartUrl(service)
 
-	handleMultipleEndpoints([]string{"/uuid", "/uuid/"}, handler.UUID)
-	handleMultipleEndpoints([]string{"/counter", "/counter/"}, handler.Counter)
+	handleMultipleEndpoints(handler.UUID, "/uuid", "/uuid/")
+	handleMultipleEndpoints(handler.Counter, "/counter", "/counter/")
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
