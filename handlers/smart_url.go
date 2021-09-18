@@ -27,26 +27,20 @@ func NewSmartUrl(service *services.SmartUrl) *SmartUrl {
 }
 
 func (h *SmartUrl) UUID(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		h.get(w, r)
-		return
-	case http.MethodPost:
-		h.create(uuidMethod, w, r)
-		return
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write([]byte("method not allowed"))
-	}
+	h.handler(uuidMethod, w, r)
 }
 
 func (h *SmartUrl) Counter(w http.ResponseWriter, r *http.Request) {
+	h.handler(counterMethod, w, r)
+}
+
+func (h *SmartUrl) handler(method string, w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		h.get(w, r)
 		return
 	case http.MethodPost:
-		h.create(counterMethod, w, r)
+		h.create(method, w, r)
 		return
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
