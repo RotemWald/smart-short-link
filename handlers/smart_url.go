@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/RotemWald/smart-short-link/entities"
 	"github.com/RotemWald/smart-short-link/services"
@@ -25,22 +26,50 @@ func NewSmartUrl(service *services.SmartUrl) *SmartUrl {
 	}
 }
 
-func (h *SmartUrl) CreateByUUID(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
+func (h *SmartUrl) UUID(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		h.get(w, r)
+		return
+	case http.MethodPost:
 		h.create(uuidMethod, w, r)
 		return
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("method not allowed"))
 	}
-	w.WriteHeader(http.StatusMethodNotAllowed)
-	w.Write([]byte("method not allowed"))
 }
 
-func (h *SmartUrl) CreateByCounter(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
+func (h *SmartUrl) Counter(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		h.get(w, r)
+		return
+	case http.MethodPost:
 		h.create(counterMethod, w, r)
 		return
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("method not allowed"))
 	}
-	w.WriteHeader(http.StatusMethodNotAllowed)
-	w.Write([]byte("method not allowed"))
+}
+
+func (h *SmartUrl) get(w http.ResponseWriter, r *http.Request) {
+	parts := strings.Split(r.URL.String(), "/")
+	if len(parts) != 3 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	url, err := h.service.GetUrl(parts[2])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.Header().Add("location", url)
+	w.WriteHeader(http.StatusFound)
 }
 
 func (h *SmartUrl) create(method string, w http.ResponseWriter, r *http.Request) {
